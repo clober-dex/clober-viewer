@@ -12,7 +12,7 @@ Or, if you want to deploy through a json file, move the json to the root folder 
 
 #### 3. Deploy contracts
 We use [hardhat-deploy](https://github.com/wighawag/hardhat-deploy) to manage our deployments.
-If you want to deploy [`Greeter` Contract](contracts/Greeter.sol), run command:
+If you want to deploy [`CloberViewer` Contract](contracts/CloberViewer.sol), run command:
 ```shell
 $ npx hardhat deploy --network localhost --tags Greeter
 
