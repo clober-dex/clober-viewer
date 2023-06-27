@@ -13,8 +13,6 @@ import 'hardhat-contract-sizer'
 import 'hardhat-abi-exporter'
 import 'solidity-coverage'
 
-import './task/index.ts'
-
 dotenv.config()
 
 import { HardhatConfig } from 'hardhat/types'
