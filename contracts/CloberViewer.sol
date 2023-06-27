@@ -57,14 +57,14 @@ contract CloberViewer is PriceBook {
     function getDepthsByPriceIndex(
         address market,
         bool isBid,
-        uint16 formIndex,
+        uint16 fromIndex,
         uint16 toIndex
     ) public view returns (DepthInfo[] memory depths) {
-        depths = new DepthInfo[](toIndex - formIndex + 1);
+        depths = new DepthInfo[](toIndex - fromIndex + 1);
 
         unchecked {
-            for (uint16 index = formIndex; index <= toIndex; ++index) {
-                uint256 i = index - formIndex;
+            for (uint16 index = fromIndex; index <= toIndex; ++index) {
+                uint256 i = index - fromIndex;
                 uint64 rawAmount = CloberOrderBook(market).getDepth(isBid, index);
                 depths[i].price = CloberOrderBook(market).indexToPrice(index);
                 depths[i].priceIndex = index;
@@ -77,24 +77,24 @@ contract CloberViewer is PriceBook {
     function getDepthsByPrice(
         address market,
         bool isBid,
-        uint256 formPrice,
+        uint256 fromPrice,
         uint256 toPrice
     ) external view returns (DepthInfo[] memory) {
-        uint16 formIndex;
+        uint16 fromIndex;
         uint16 toIndex;
         CloberMarketFactory.MarketInfo memory marketInfo = _factoryV1.getMarketInfo(market);
         if (marketInfo.marketType == CloberMarketFactory.MarketType.NONE) {
-            (formIndex, ) = CloberOrderBook(market).priceToIndex(formPrice, true);
+            (fromIndex, ) = CloberOrderBook(market).priceToIndex(fromPrice, true);
             (toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
         } else if (marketInfo.marketType == CloberMarketFactory.MarketType.VOLATILE) {
             require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R));
-            formIndex = _volatilePriceToIndex(formPrice, true);
+            fromIndex = _volatilePriceToIndex(fromPrice, true);
             toIndex = _volatilePriceToIndex(toPrice, false);
         } else {
-            formIndex = _stablePriceToIndex(marketInfo.a, marketInfo.factor, formPrice, true);
+            fromIndex = _stablePriceToIndex(marketInfo.a, marketInfo.factor, fromPrice, true);
             toIndex = _stablePriceToIndex(marketInfo.a, marketInfo.factor, toPrice, false);
         }
 
-        return getDepthsByPriceIndex(market, isBid, formIndex, toIndex);
+        return getDepthsByPriceIndex(market, isBid, fromIndex, toIndex);
     }
 }
