@@ -9,6 +9,7 @@ import "./interfaces/CloberOrderNFTDeployer.sol";
 contract CloberViewer {
     struct DepthInfo {
         uint256 price;
+        uint256 priceIndex;
         uint256 quoteAmount;
         uint256 baseAmount;
     }
@@ -49,12 +50,15 @@ contract CloberViewer {
 
         depths = new DepthInfo[](toIndex - formIndex + 1);
 
-        for (uint16 index = formIndex; index <= toIndex; ++index) {
-            uint256 i = index - formIndex;
-            uint64 rawAmount = CloberOrderBook(market).getDepth(isBid, index);
-            depths[i].price = CloberOrderBook(market).indexToPrice(index);
-            depths[i].quoteAmount = CloberOrderBook(market).rawToQuote(rawAmount);
-            depths[i].baseAmount = CloberOrderBook(market).rawToBase(rawAmount, index, false);
+        unchecked {
+            for (uint16 index = formIndex; index <= toIndex; ++index) {
+                uint256 i = index - formIndex;
+                uint64 rawAmount = CloberOrderBook(market).getDepth(isBid, index);
+                depths[i].price = CloberOrderBook(market).indexToPrice(index);
+                depths[i].priceIndex = index;
+                depths[i].quoteAmount = CloberOrderBook(market).rawToQuote(rawAmount);
+                depths[i].baseAmount = CloberOrderBook(market).rawToBase(rawAmount, index, false);
+            }
         }
     }
 }
