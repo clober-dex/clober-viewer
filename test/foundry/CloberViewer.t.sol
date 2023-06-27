@@ -7,8 +7,15 @@ import "../../contracts/CloberViewer.sol";
 
 contract CloberViewerTest is Test {
     string constant URL = "https://arbitrum.public-rpc.com";
+    uint256 constant CHAIN_ID = 42161;
+    uint256 constant BLOCK_NUMBER = 105060000;
+    uint256 constant SUPPORT_V1_NO = 13;
+
     address constant CLOBER_FACTORY = 0x24aC0938C010Fb520F1068e96d78E0458855111D;
     address constant CLOBER_FACTORY_V1 = 0x93A43391978BFC0bc708d5f55b0Abe7A9ede1B91;
+    uint128 private constant VOLATILE_A = 10000000000;
+    uint128 private constant VOLATILE_R = 1001000000000000000;
+
     uint256 arbitrum;
     CloberViewer viewer;
 
@@ -16,13 +23,22 @@ contract CloberViewerTest is Test {
         arbitrum = vm.createFork(URL);
         vm.selectFork(arbitrum);
         assertEq(vm.activeFork(), arbitrum);
-        vm.rollFork(105060000);
-        viewer = new CloberViewer(CLOBER_FACTORY, CLOBER_FACTORY_V1, 42161);
+        vm.rollFork(BLOCK_NUMBER);
+        viewer = new CloberViewer(CLOBER_FACTORY, CLOBER_FACTORY_V1, CHAIN_ID, SUPPORT_V1_NO);
     }
 
     function testGetAllMarket() public {
         address[] memory markets = viewer.getAllMarkets();
         assertEq(markets.length, 14);
+
+        for (uint256 i = 0; i < SUPPORT_V1_NO; ++i) {
+            CloberMarketFactory.MarketInfo memory marketInfo = CloberMarketFactory(CLOBER_FACTORY_V1).getMarketInfo(
+                markets[i]
+            );
+            if (marketInfo.marketType == CloberMarketFactory.MarketType.VOLATILE) {
+                require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R), "11");
+            }
+        }
 
         assertEq(markets[0], 0xC3c5316AE6f1e522E65074b70608C1Df01F93AE0);
         assertEq(markets[6], 0x31953016364543d12FEFbc1418810Ded511044a0);

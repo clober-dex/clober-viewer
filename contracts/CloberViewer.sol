@@ -20,6 +20,7 @@ contract CloberViewer is PriceBook {
     CloberMarketFactory private immutable _factoryV1;
     CloberOrderNFTDeployer private immutable _orderNFTDeployer;
     uint256 private immutable _cachedChainId;
+    uint256 private immutable _v1PoolCount;
 
     uint128 private constant VOLATILE_A = 10000000000;
     uint128 private constant VOLATILE_R = 1001000000000000000;
@@ -27,26 +28,27 @@ contract CloberViewer is PriceBook {
     constructor(
         address factory,
         address factoryV1,
-        uint256 cachedChainId
+        uint256 cachedChainId,
+        uint256 v1PoolCount
     ) PriceBook(VOLATILE_A, VOLATILE_R) {
         _factory = CloberMarketFactory(factory);
         _factoryV1 = CloberMarketFactory(factoryV1);
         _orderNFTDeployer = CloberOrderNFTDeployer(_factory.orderTokenDeployer());
         _cachedChainId = cachedChainId;
+        _v1PoolCount = v1PoolCount;
     }
 
     function getAllMarkets() external view returns (address[] memory markets) {
-        uint256 nonceV1 = 13; //_factoryV1.nonce()
-        uint256 length = _factory.nonce() + nonceV1;
+        uint256 length = _factory.nonce() + _v1PoolCount;
 
         markets = new address[](length);
         unchecked {
-            for (uint256 i = 0; i < nonceV1; ++i) {
+            for (uint256 i = 0; i < _v1PoolCount; ++i) {
                 markets[i] = CloberOrderNFT(CloberMarketFactory(_factoryV1).computeTokenAddress(i)).market();
             }
 
-            for (uint256 i = nonceV1; i < length; ++i) {
-                bytes32 salt = keccak256(abi.encode(_cachedChainId, i - nonceV1));
+            for (uint256 i = _v1PoolCount; i < length; ++i) {
+                bytes32 salt = keccak256(abi.encode(_cachedChainId, i - _v1PoolCount));
                 markets[i] = CloberOrderNFT(_orderNFTDeployer.computeTokenAddress(salt)).market();
             }
         }
