@@ -125,7 +125,8 @@ const config: HardhatConfig = {
     [polygon.id]: {
       url: polygon.rpcUrls.default.http[0],
       chainId: polygon.id,
-      accounts: [getMainnetPrivateKey()],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gas: 'auto',
       gasPrice: 'auto',
       gasMultiplier: 1,
@@ -139,7 +140,8 @@ const config: HardhatConfig = {
     [arbitrum.id]: {
       url: arbitrum.rpcUrls.default.http[0],
       chainId: arbitrum.id,
-      accounts: [getMainnetPrivateKey()],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gas: 'auto',
       gasPrice: 'auto',
       gasMultiplier: 1,
@@ -153,7 +155,8 @@ const config: HardhatConfig = {
     [polygonZkEvm.id]: {
       url: polygonZkEvm.rpcUrls.default.http[0],
       chainId: polygonZkEvm.id,
-      accounts: [getMainnetPrivateKey()],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gas: 'auto',
       gasPrice: 'auto',
       gasMultiplier: 1,
