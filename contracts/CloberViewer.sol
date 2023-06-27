@@ -31,6 +31,7 @@ contract CloberViewer is PriceBook {
         uint256 cachedChainId,
         uint256 v1PoolCount
     ) PriceBook(VOLATILE_A, VOLATILE_R) {
+        require(factory != address(0) || factoryV1 != address(0));
         _factory = CloberMarketFactory(factory);
         _factoryV1 = CloberMarketFactoryV1(factoryV1);
         _orderNFTDeployer = factory == address(0)
