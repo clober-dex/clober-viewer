@@ -37,7 +37,7 @@ deployments
     ├── localhost
     │   └── address.json
     └── typechain
-        ├── Greeter.ts
+        ├── CloberViewer.ts
         ├── common.ts
         ├── factories
         │   ├── Greeter__factory.ts

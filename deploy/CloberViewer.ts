@@ -6,8 +6,8 @@ import {
   CLOBER_FACTORY,
   CLOBER_FACTORY_V1,
   SUPPORT_V1_NO,
-} from '../../utils/constant'
-import { liveLog } from '../../utils/misc'
+} from '../utils/constant'
+import { liveLog } from '../utils/misc'
 
 const deployFunction: DeployFunction = async function (
   hre: HardhatRuntimeEnvironment,
