@@ -227,6 +227,12 @@ interface CloberMarketFactory {
     function executeChangeOwner() external;
 
     /**
+     * @notice Computes the OrderNFT contract address
+     * @param marketNonce The nonce to compute the OrderNFT contract address via CREATE2.
+     */
+    function computeTokenAddress(uint256 marketNonce) external view returns (address);
+
+    /**
      * @notice Returns the host address of the given market.
      * @param market The address of the target market.
      * @return The host address of the market.
