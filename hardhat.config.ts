@@ -16,7 +16,13 @@ import 'solidity-coverage'
 dotenv.config()
 
 import { HardhatConfig } from 'hardhat/types'
-import { arbitrum, localhost, mainnet, polygon } from '@wagmi/chains'
+import {
+  arbitrum,
+  localhost,
+  mainnet,
+  polygon,
+  polygonZkEvm,
+} from '@wagmi/chains'
 
 const networkInfos = require('@wagmi/chains')
 const chainIdMap: { [key: string]: string } = {}
@@ -46,14 +52,19 @@ const getMainnetPrivateKey = () => {
     }
   }
 
-  const prodNetworks = new Set<number>([mainnet.id, polygon.id, arbitrum.id])
+  const prodNetworks = new Set<number>([
+    mainnet.id,
+    polygon.id,
+    arbitrum.id,
+    polygonZkEvm.id,
+  ])
   if (network && prodNetworks.has(network)) {
     if (privateKey) {
       return privateKey
     }
     const keythereum = require('keythereum')
 
-    const KEYSTORE = './clober-deployer-key.json'
+    const KEYSTORE = './clober-v1.1-deployer-key.json'
     const PASSWORD = readlineSync.question('Password: ', {
       hideEchoBack: true,
     })
@@ -97,6 +108,62 @@ const config: HardhatConfig = {
   },
   defaultNetwork: 'hardhat',
   networks: {
+    [mainnet.id]: {
+      url: mainnet.rpcUrls.default.http[0],
+      chainId: mainnet.id,
+      accounts: [getMainnetPrivateKey()],
+      gas: 'auto',
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      timeout: 3000000,
+      httpHeaders: {},
+      live: true,
+      saveDeployments: true,
+      tags: ['mainnet', 'prod'],
+      companionNetworks: {},
+    },
+    [polygon.id]: {
+      url: polygon.rpcUrls.default.http[0],
+      chainId: polygon.id,
+      accounts: [getMainnetPrivateKey()],
+      gas: 'auto',
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      timeout: 3000000,
+      httpHeaders: {},
+      live: true,
+      saveDeployments: true,
+      tags: ['mainnet', 'prod'],
+      companionNetworks: {},
+    },
+    [arbitrum.id]: {
+      url: arbitrum.rpcUrls.default.http[0],
+      chainId: arbitrum.id,
+      accounts: [getMainnetPrivateKey()],
+      gas: 'auto',
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      timeout: 3000000,
+      httpHeaders: {},
+      live: true,
+      saveDeployments: true,
+      tags: ['mainnet', 'prod'],
+      companionNetworks: {},
+    },
+    [polygonZkEvm.id]: {
+      url: polygonZkEvm.rpcUrls.default.http[0],
+      chainId: polygonZkEvm.id,
+      accounts: [getMainnetPrivateKey()],
+      gas: 'auto',
+      gasPrice: 'auto',
+      gasMultiplier: 1,
+      timeout: 3000000,
+      httpHeaders: {},
+      live: true,
+      saveDeployments: true,
+      tags: ['mainnet', 'prod'],
+      companionNetworks: {},
+    },
     hardhat: {
       chainId: localhost.id,
       gas: 20000000,
