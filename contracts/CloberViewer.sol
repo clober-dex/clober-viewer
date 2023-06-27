@@ -1,7 +1,7 @@
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Create2.sol";
 import "./interfaces/CloberMarketFactory.sol";
+import "./interfaces/CloberMarketFactoryV1.sol";
 import "./interfaces/CloberOrderBook.sol";
 import "./interfaces/CloberPriceBook.sol";
 import "./interfaces/CloberOrderNFT.sol";
@@ -17,7 +17,7 @@ contract CloberViewer is PriceBook {
     }
 
     CloberMarketFactory private immutable _factory;
-    CloberMarketFactory private immutable _factoryV1;
+    CloberMarketFactoryV1 private immutable _factoryV1;
     CloberOrderNFTDeployer private immutable _orderNFTDeployer;
     uint256 private immutable _cachedChainId;
     uint256 private immutable _v1PoolCount;
@@ -32,7 +32,7 @@ contract CloberViewer is PriceBook {
         uint256 v1PoolCount
     ) PriceBook(VOLATILE_A, VOLATILE_R) {
         _factory = CloberMarketFactory(factory);
-        _factoryV1 = CloberMarketFactory(factoryV1);
+        _factoryV1 = CloberMarketFactoryV1(factoryV1);
         _orderNFTDeployer = CloberOrderNFTDeployer(_factory.orderTokenDeployer());
         _cachedChainId = cachedChainId;
         _v1PoolCount = v1PoolCount;
@@ -44,7 +44,7 @@ contract CloberViewer is PriceBook {
         markets = new address[](length);
         unchecked {
             for (uint256 i = 0; i < _v1PoolCount; ++i) {
-                markets[i] = CloberOrderNFT(CloberMarketFactory(_factoryV1).computeTokenAddress(i)).market();
+                markets[i] = CloberOrderNFT(_factoryV1.computeTokenAddress(i)).market();
             }
 
             for (uint256 i = _v1PoolCount; i < length; ++i) {
@@ -82,11 +82,11 @@ contract CloberViewer is PriceBook {
     ) external view returns (DepthInfo[] memory) {
         uint16 fromIndex;
         uint16 toIndex;
-        CloberMarketFactory.MarketInfo memory marketInfo = _factoryV1.getMarketInfo(market);
-        if (marketInfo.marketType == CloberMarketFactory.MarketType.NONE) {
+        CloberMarketFactoryV1.MarketInfo memory marketInfo = _factoryV1.getMarketInfo(market);
+        if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.NONE) {
             (fromIndex, ) = CloberOrderBook(market).priceToIndex(fromPrice, true);
             (toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
-        } else if (marketInfo.marketType == CloberMarketFactory.MarketType.VOLATILE) {
+        } else if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.VOLATILE) {
             require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R));
             fromIndex = _volatilePriceToIndex(fromPrice, true);
             toIndex = _volatilePriceToIndex(toPrice, false);

@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.0;
 
-interface CloberMarketFactory {
+interface CloberMarketFactoryV1 {
     /**
      * @notice Emitted when a new volatile market is created.
      * @param market The address of the new market.
@@ -86,34 +86,16 @@ interface CloberMarketFactory {
     event ChangeHost(address indexed market, address previousHost, address newHost);
 
     /**
-     * @notice Returns the address of the deployed GeometricPriceBook.
-     * @return The address of the GeometricPriceBook.
+     * @notice Returns the address of the VolatileMarketDeployer.
+     * @return The address of the VolatileMarketDeployer.
      */
-    function deployedGeometricPriceBook(uint128 a, uint128 r) external view returns (address);
+    function volatileMarketDeployer() external view returns (address);
 
     /**
-     * @notice Returns the address of the deployed GeometricPriceBook.
-     * @return The address of the GeometricPriceBook.
+     * @notice Returns the address of the StableMarketDeployer.
+     * @return The address of the StableMarketDeployer.
      */
-    function deployedArithmeticPriceBook(uint128 a, uint128 d) external view returns (address);
-
-    /**
-     * @notice Returns the address of the MarketDeployer.
-     * @return The address of the MarketDeployer.
-     */
-    function marketDeployer() external view returns (address);
-
-    /**
-     * @notice Returns the address of the priceBookDeployer.
-     * @return The address of the priceBookDeployer.
-     */
-    function priceBookDeployer() external view returns (address);
-
-    /**
-     * @notice Returns the address of the orderTokenDeployer.
-     * @return The address of the orderTokenDeployer.
-     */
-    function orderTokenDeployer() external view returns (address);
+    function stableMarketDeployer() external view returns (address);
 
     /**
      * @notice Returns the address of the OrderCanceler.
@@ -247,6 +229,12 @@ interface CloberMarketFactory {
      * @param market The market address for which the host will be changed.
      */
     function executeHandOverHost(address market) external;
+
+    /**
+     * @notice Computes the OrderNFT contract address.
+     * @param marketNonce The nonce to compute the OrderNFT contract address via CREATE2.
+     */
+    function computeTokenAddress(uint256 marketNonce) external view returns (address);
 
     enum MarketType {
         NONE,
