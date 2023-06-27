@@ -39,15 +39,12 @@ contract CloberViewer {
         }
     }
 
-    function getDepths(
+    function getDepthsByPriceIndex(
         address market,
         bool isBid,
-        uint256 formPrice,
-        uint256 toPrice
-    ) external view returns (DepthInfo[] memory depths) {
-        (uint16 formIndex, ) = CloberOrderBook(market).priceToIndex(formPrice, true);
-        (uint16 toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
-
+        uint16 formIndex,
+        uint16 toIndex
+    ) public view returns (DepthInfo[] memory depths) {
         depths = new DepthInfo[](toIndex - formIndex + 1);
 
         unchecked {
@@ -60,5 +57,17 @@ contract CloberViewer {
                 depths[i].baseAmount = CloberOrderBook(market).rawToBase(rawAmount, index, false);
             }
         }
+    }
+
+    function getDepthsByPrice(
+        address market,
+        bool isBid,
+        uint256 formPrice,
+        uint256 toPrice
+    ) external view returns (DepthInfo[] memory) {
+        (uint16 formIndex, ) = CloberOrderBook(market).priceToIndex(formPrice, true);
+        (uint16 toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
+
+        return getDepthsByPriceIndex(market, isBid, formIndex, toIndex);
     }
 }

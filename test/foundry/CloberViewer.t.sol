@@ -27,7 +27,7 @@ contract CloberViewerTest is Test {
     }
 
     function testGetAskDepths() public {
-        CloberViewer.DepthInfo[] memory depthInfo = viewer.getDepths(
+        CloberViewer.DepthInfo[] memory depthInfo = viewer.getDepthsByPrice(
             0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
             false,
             146000000000000,
@@ -43,7 +43,7 @@ contract CloberViewerTest is Test {
     }
 
     function testGetBidDepths() public {
-        CloberViewer.DepthInfo[] memory depthInfo = viewer.getDepths(
+        CloberViewer.DepthInfo[] memory depthInfo = viewer.getDepthsByPrice(
             0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
             true,
             136000000000000,
