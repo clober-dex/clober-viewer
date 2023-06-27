@@ -18,9 +18,9 @@ export const CLOBER_FACTORY_V1: { [network: string]: string } = {
   [polygonZkEvm.id]: '',
 }
 
-export const SUPPORT_V1_NO: { [network: string]: string } = {
-  [mainnet.id]: '',
-  [arbitrum.id]: '',
-  [polygon.id]: '',
-  [polygonZkEvm.id]: '',
+export const SUPPORT_V1_NO: { [network: string]: number } = {
+  [mainnet.id]: 0,
+  [arbitrum.id]: 0,
+  [polygon.id]: 0,
+  [polygonZkEvm.id]: 0,
 }
