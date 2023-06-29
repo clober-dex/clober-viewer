@@ -32,11 +32,11 @@ contract CloberViewerTest is Test {
         assertEq(markets.length, 14);
 
         for (uint256 i = 0; i < SUPPORT_V1_NO; ++i) {
-            CloberMarketFactory.MarketInfo memory marketInfo = CloberMarketFactory(CLOBER_FACTORY_V1).getMarketInfo(
+            CloberMarketFactoryV1.MarketInfo memory marketInfo = CloberMarketFactoryV1(CLOBER_FACTORY_V1).getMarketInfo(
                 markets[i]
             );
-            if (marketInfo.marketType == CloberMarketFactory.MarketType.VOLATILE) {
-                require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R), "11");
+            if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.VOLATILE) {
+                require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R));
             }
         }
 

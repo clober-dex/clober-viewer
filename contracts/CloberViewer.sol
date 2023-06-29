@@ -33,25 +33,38 @@ contract CloberViewer is PriceBook {
         uint256 cachedChainId,
         uint256 v1PoolCount
     ) PriceBook(VOLATILE_A, VOLATILE_R) {
+        require(factory != address(0) || factoryV1 != address(0));
         _factory = CloberMarketFactory(factory);
         _factoryV1 = CloberMarketFactoryV1(factoryV1);
-        _orderNFTDeployer = CloberOrderNFTDeployer(_factory.orderTokenDeployer());
+        _orderNFTDeployer = factory == address(0)
+            ? CloberOrderNFTDeployer(address(0))
+            : CloberOrderNFTDeployer(_factory.orderTokenDeployer());
         _cachedChainId = cachedChainId;
+        if (factoryV1 == address(0)) v1PoolCount = 0;
         _v1PoolCount = v1PoolCount;
     }
 
     function getAllMarkets() external view returns (address[] memory markets) {
-        uint256 length = _factory.nonce() + _v1PoolCount;
-
-        markets = new address[](length);
         unchecked {
-            for (uint256 i = 0; i < _v1PoolCount; ++i) {
-                markets[i] = CloberOrderNFT(_factoryV1.computeTokenAddress(i)).market();
-            }
+            uint256 length;
+            if (address(_factory) == address(0)) {
+                length = _factoryV1.nonce();
+                markets = new address[](length);
+                for (uint256 i = 0; i < length; ++i) {
+                    markets[i] = CloberOrderNFT(_factoryV1.computeTokenAddress(i)).market();
+                }
+            } else {
+                length = _factory.nonce() + _v1PoolCount;
 
-            for (uint256 i = _v1PoolCount; i < length; ++i) {
-                bytes32 salt = keccak256(abi.encode(_cachedChainId, i - _v1PoolCount));
-                markets[i] = CloberOrderNFT(_orderNFTDeployer.computeTokenAddress(salt)).market();
+                markets = new address[](length);
+                for (uint256 i = 0; i < _v1PoolCount; ++i) {
+                    markets[i] = CloberOrderNFT(_factoryV1.computeTokenAddress(i)).market();
+                }
+
+                for (uint256 i = _v1PoolCount; i < length; ++i) {
+                    bytes32 salt = keccak256(abi.encode(_cachedChainId, i - _v1PoolCount));
+                    markets[i] = CloberOrderNFT(_orderNFTDeployer.computeTokenAddress(salt)).market();
+                }
             }
         }
     }
@@ -84,7 +97,8 @@ contract CloberViewer is PriceBook {
     ) external view returns (DepthInfo[] memory) {
         uint16 fromIndex;
         uint16 toIndex;
-        CloberMarketFactoryV1.MarketInfo memory marketInfo = _factoryV1.getMarketInfo(market);
+        CloberMarketFactoryV1.MarketInfo memory marketInfo;
+        if (address(_factoryV1) != address(0)) marketInfo = _factoryV1.getMarketInfo(market);
         if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.NONE) {
             (fromIndex, ) = CloberOrderBook(market).priceToIndex(fromPrice, true);
             (toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
