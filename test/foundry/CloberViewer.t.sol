@@ -59,6 +59,14 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[1].price, 148283317938545);
         assertEq(depthInfo[1].quoteAmount, 200000000);
         assertEq(depthInfo[1].baseAmount, 1348769388090497292116848);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getOrderBook(
+            0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
+            false
+        );
+        assertEq(orderBook[0].price, 146815166275788);
+        assertEq(orderBook[0].amount, 1360818395455838781356042);
+        assertEq(orderBook[1].price, 148283317938545);
+        assertEq(orderBook[1].amount, 1348769388090497292116848);
     }
 
     function testGetBidDepths() public {
@@ -72,6 +80,12 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[0].price, 136937156290258);
         assertEq(depthInfo[0].quoteAmount, 374);
         assertEq(depthInfo[0].baseAmount, 2731179835568172624);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getOrderBook(
+            0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
+            true
+        );
+        assertEq(orderBook[0].price, 136937156290258);
+        assertEq(orderBook[0].amount, 374);
     }
 
     function testGetAskDepthsV1Volatile() public {
