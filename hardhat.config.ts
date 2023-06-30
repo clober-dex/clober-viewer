@@ -136,6 +136,12 @@ const config: HardhatConfig = {
       saveDeployments: true,
       tags: ['mainnet', 'prod'],
       companionNetworks: {},
+      verify: {
+        etherscan: {
+          apiKey: process.env.POLYGONSCAN_API_KEY,
+          apiUrl: 'https://api.polygonscan.com',
+        },
+      },
     },
     [arbitrum.id]: {
       url: arbitrum.rpcUrls.default.http[0],
@@ -151,6 +157,12 @@ const config: HardhatConfig = {
       saveDeployments: true,
       tags: ['mainnet', 'prod'],
       companionNetworks: {},
+      verify: {
+        etherscan: {
+          apiKey: process.env.ARBISCAN_API_KEY,
+          apiUrl: 'https://api.arbiscan.io',
+        },
+      },
     },
     [polygonZkEvm.id]: {
       url: polygonZkEvm.rpcUrls.default.http[0],
