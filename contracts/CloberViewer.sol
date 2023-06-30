@@ -119,9 +119,12 @@ contract CloberViewer is PriceBook {
             }
         }
         elements = new OrderBookElement[](count);
-        for (uint256 i = 0; i < count; ++i) {
-            elements[i].price = _elements[i].price;
-            elements[i].amount = _elements[i].amount;
+        count = 0;
+        for (uint256 i = 0; i < _elements.length; ++i) {
+            if (_elements[i].price != 0) {
+                elements[count] = _elements[i];
+                ++count;
+            }
         }
     }
 
