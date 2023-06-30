@@ -79,6 +79,7 @@ contract CloberViewer is PriceBook {
         bool isBidSide
     ) public view returns (OrderBookElement[] memory elements) {
         uint256 fromIndex = CloberOrderBook(market).bestPriceIndex(isBidSide);
+        uint16 maxPriceIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
         OrderBookElement[] memory _elements = new OrderBookElement[](256);
         uint256 count = 0;
 
@@ -95,7 +96,7 @@ contract CloberViewer is PriceBook {
                 ++count;
             }
         } else {
-            uint256 toIndex = fromIndex + 256 > type(uint16).max ? type(uint16).max : uint16(fromIndex) + 256;
+            uint256 toIndex = fromIndex + 256 > maxPriceIndex ? maxPriceIndex : uint16(fromIndex) + 256;
             for (uint256 index = fromIndex; index < toIndex; ++index) {
                 uint256 i = index - fromIndex;
                 uint64 rawAmount = CloberOrderBook(market).getDepth(false, uint16(index));
@@ -145,8 +146,8 @@ contract CloberViewer is PriceBook {
         CloberMarketFactoryV1.MarketInfo memory marketInfo;
         if (address(_factoryV1) != address(0)) marketInfo = _factoryV1.getMarketInfo(market);
         if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.NONE) {
-            (fromIndex,) = CloberOrderBook(market).priceToIndex(fromPrice, true);
-            (toIndex,) = CloberOrderBook(market).priceToIndex(toPrice, false);
+            (fromIndex, ) = CloberOrderBook(market).priceToIndex(fromPrice, true);
+            (toIndex, ) = CloberOrderBook(market).priceToIndex(toPrice, false);
         } else if (marketInfo.marketType == CloberMarketFactoryV1.MarketType.VOLATILE) {
             require((marketInfo.a == VOLATILE_A) && (marketInfo.factor == VOLATILE_R));
             fromIndex = _volatilePriceToIndex(fromPrice, true);
