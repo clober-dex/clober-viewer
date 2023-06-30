@@ -18,6 +18,13 @@ contract CloberViewer is PriceBook {
         uint256 baseAmount;
     }
 
+    struct OrderBookElement {
+        uint256 price;
+        uint256 amount;
+    }
+
+    uint16 private constant _DEFAULT_EXPLORATION_INDEX_COUNT = 256;
+
     CloberMarketFactory private immutable _factory;
     CloberMarketFactoryV1 private immutable _factoryV1;
     CloberOrderNFTDeployer private immutable _orderNFTDeployer;
@@ -64,6 +71,60 @@ contract CloberViewer is PriceBook {
                 for (uint256 i = _v1PoolCount; i < length; ++i) {
                     bytes32 salt = keccak256(abi.encode(_cachedChainId, i - _v1PoolCount));
                     markets[i] = CloberOrderNFT(_orderNFTDeployer.computeTokenAddress(salt)).market();
+                }
+            }
+        }
+    }
+
+    function getDepths(address market, bool isBidSide) external view returns (OrderBookElement[] memory) {
+        return getDepths(market, isBidSide, _DEFAULT_EXPLORATION_INDEX_COUNT);
+    }
+
+    function getDepths(
+        address market,
+        bool isBidSide,
+        uint16 explorationIndexCount
+    ) public view returns (OrderBookElement[] memory elements) {
+        unchecked {
+            uint256 fromIndex = CloberOrderBook(market).bestPriceIndex(isBidSide);
+            uint256 maxIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
+            OrderBookElement[] memory _elements = new OrderBookElement[](explorationIndexCount);
+            uint256 count = 0;
+
+            if (isBidSide) {
+                uint16 toIndex = fromIndex > explorationIndexCount ? uint16(fromIndex) - explorationIndexCount : 0;
+                for (uint16 index = uint16(fromIndex); index > toIndex; --index) {
+                    uint256 i = fromIndex - index;
+                    uint64 rawAmount = CloberOrderBook(market).getDepth(true, index);
+                    if (rawAmount == 0) {
+                        continue;
+                    }
+                    _elements[i].price = CloberOrderBook(market).indexToPrice(index);
+                    _elements[i].amount = CloberOrderBook(market).rawToQuote(rawAmount);
+                    ++count;
+                }
+            } else {
+                // fromIndex + explorationIndexCount <= 2 * type(uint16).max, so it is safe from the overflow
+                uint256 toIndex = fromIndex + explorationIndexCount > maxIndex
+                    ? maxIndex
+                    : fromIndex + explorationIndexCount;
+                for (uint256 index = fromIndex; index < toIndex; ++index) {
+                    uint256 i = index - fromIndex;
+                    uint64 rawAmount = CloberOrderBook(market).getDepth(false, uint16(index));
+                    if (rawAmount == 0) {
+                        continue;
+                    }
+                    _elements[i].price = CloberOrderBook(market).indexToPrice(uint16(index));
+                    _elements[i].amount = CloberOrderBook(market).rawToBase(rawAmount, uint16(index), false);
+                    ++count;
+                }
+            }
+            elements = new OrderBookElement[](count);
+            count = 0;
+            for (uint256 i = 0; i < _elements.length; ++i) {
+                if (_elements[i].price != 0) {
+                    elements[count] = _elements[i];
+                    ++count;
                 }
             }
         }
