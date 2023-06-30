@@ -23,6 +23,8 @@ contract CloberViewer is PriceBook {
         uint256 amount;
     }
 
+    uint16 private constant _DEFAULT_EXPLORATION_INDEX_COUNT = 256;
+
     CloberMarketFactory private immutable _factory;
     CloberMarketFactoryV1 private immutable _factoryV1;
     CloberOrderNFTDeployer private immutable _orderNFTDeployer;
@@ -74,17 +76,22 @@ contract CloberViewer is PriceBook {
         }
     }
 
-    function getOrderBook(
+    function getDepths(address market, bool isBidSide) external view returns (OrderBookElement[] memory) {
+        return getDepths(market, isBidSide, _DEFAULT_EXPLORATION_INDEX_COUNT);
+    }
+
+    function getDepths(
         address market,
-        bool isBidSide
+        bool isBidSide,
+        uint16 explorationIndexCount
     ) public view returns (OrderBookElement[] memory elements) {
         uint256 fromIndex = CloberOrderBook(market).bestPriceIndex(isBidSide);
-        uint16 maxPriceIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
-        OrderBookElement[] memory _elements = new OrderBookElement[](256);
+        uint256 maxIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
+        OrderBookElement[] memory _elements = new OrderBookElement[](explorationIndexCount);
         uint256 count = 0;
 
         if (isBidSide) {
-            uint16 toIndex = fromIndex > 256 ? uint16(fromIndex) - 256 : 0;
+            uint16 toIndex = fromIndex > explorationIndexCount ? uint16(fromIndex) - explorationIndexCount : 0;
             for (uint16 index = uint16(fromIndex); index > toIndex; --index) {
                 uint256 i = fromIndex - index;
                 uint64 rawAmount = CloberOrderBook(market).getDepth(true, index);
@@ -96,7 +103,10 @@ contract CloberViewer is PriceBook {
                 ++count;
             }
         } else {
-            uint256 toIndex = fromIndex + 256 > maxPriceIndex ? maxPriceIndex : uint16(fromIndex) + 256;
+            // fromIndex + explorationIndexCount <= 2 * type(uint16).max, so it is safe from the overflow
+            uint256 toIndex = fromIndex + explorationIndexCount > maxIndex
+                ? maxIndex
+                : fromIndex + explorationIndexCount;
             for (uint256 index = fromIndex; index < toIndex; ++index) {
                 uint256 i = index - fromIndex;
                 uint64 rawAmount = CloberOrderBook(market).getDepth(false, uint16(index));

@@ -59,7 +59,7 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[1].price, 148283317938545);
         assertEq(depthInfo[1].quoteAmount, 200000000);
         assertEq(depthInfo[1].baseAmount, 1348769388090497292116848);
-        CloberViewer.OrderBookElement[] memory orderBook = viewer.getOrderBook(
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
             0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
             false
         );
@@ -80,7 +80,7 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[0].price, 136937156290258);
         assertEq(depthInfo[0].quoteAmount, 374);
         assertEq(depthInfo[0].baseAmount, 2731179835568172624);
-        CloberViewer.OrderBookElement[] memory orderBook = viewer.getOrderBook(
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
             0xcA4C669093572c5a23DE04B848a7f706eCBdFAC2,
             true
         );
