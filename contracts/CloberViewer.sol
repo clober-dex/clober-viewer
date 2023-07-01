@@ -87,7 +87,12 @@ contract CloberViewer is PriceBook {
     ) public view returns (OrderBookElement[] memory elements) {
         unchecked {
             uint256 fromIndex = CloberOrderBook(market).bestPriceIndex(isBidSide);
-            uint256 maxIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
+            uint256 maxIndex;
+            if (address(_factory) != address(0) && _factory.getMarketHost(market) != address(0)) {
+                maxIndex = CloberPriceBook(CloberOrderBook(market).priceBook()).maxPriceIndex();
+            } else {
+                maxIndex = type(uint16).max;
+            }
             OrderBookElement[] memory _elements = new OrderBookElement[](explorationIndexCount);
             uint256 count = 0;
 

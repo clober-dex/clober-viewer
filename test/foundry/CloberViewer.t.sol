@@ -102,6 +102,12 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[1].price, 1993248310131976904);
         assertEq(depthInfo[1].quoteAmount, 0);
         assertEq(depthInfo[1].baseAmount, 0);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
+            0xE462374433029Bf889532F7fd3692ccAB736a559,
+            false
+        );
+        assertEq(orderBook[0].price, 1991257053078898004);
+        assertEq(orderBook[0].amount, 9999999733440251112);
     }
 
     function testGetBidDepthsV1Volatile() public {
@@ -121,6 +127,12 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[2].price, 1003113733404803086);
         assertEq(depthInfo[2].quoteAmount, 0);
         assertEq(depthInfo[2].baseAmount, 0);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
+            0xE462374433029Bf889532F7fd3692ccAB736a559,
+            true
+        );
+        assertEq(orderBook[0].price, 1002111621783020066);
+        assertEq(orderBook[0].amount, 1204443);
     }
 
     function testGetAskDepthsV1Stable() public {
@@ -140,6 +152,12 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[2].price, 905000000000000000);
         assertEq(depthInfo[2].quoteAmount, 0);
         assertEq(depthInfo[2].baseAmount, 0);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
+            0xa416b5807c68259B057326dEEF59d5B2053969EE,
+            false
+        );
+        assertEq(orderBook[0].price, 900000000000000000);
+        assertEq(orderBook[0].amount, 3331261501664444444444);
     }
 
     function testGetBidDepthsV1Stable() public {
@@ -159,5 +177,11 @@ contract CloberViewerTest is Test {
         assertEq(depthInfo[2].price, 998000000000000000);
         assertEq(depthInfo[2].quoteAmount, 0);
         assertEq(depthInfo[2].baseAmount, 0);
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
+            0x02F4DC911919AcB274ceA42DfEb3481C88E4D330,
+            true
+        );
+        assertEq(orderBook[0].price, 997900000000000000);
+        assertEq(orderBook[0].amount, 4989500);
     }
 }
