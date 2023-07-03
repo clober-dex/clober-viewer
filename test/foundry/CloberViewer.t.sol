@@ -184,4 +184,12 @@ contract CloberViewerTest is Test {
         assertEq(orderBook[0].price, 997900000000000000);
         assertEq(orderBook[0].amount, 4989500);
     }
+
+    function testGetDepthsEmptyOrderBook() public {
+        CloberViewer.OrderBookElement[] memory orderBook = viewer.getDepths(
+            0xC3c5316AE6f1e522E65074b70608C1Df01F93AE0,
+            false
+        );
+        assertEq(orderBook.length, 0);
+    }
 }
