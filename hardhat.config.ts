@@ -111,7 +111,8 @@ const config: HardhatConfig = {
     [mainnet.id]: {
       url: mainnet.rpcUrls.default.http[0],
       chainId: mainnet.id,
-      accounts: [getMainnetPrivateKey()],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gas: 'auto',
       gasPrice: 'auto',
       gasMultiplier: 1,
