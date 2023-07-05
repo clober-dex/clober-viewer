@@ -122,6 +122,12 @@ const config: HardhatConfig = {
       saveDeployments: true,
       tags: ['mainnet', 'prod'],
       companionNetworks: {},
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiUrl: 'https://api.etherscan.io',
+        },
+      },
     },
     [polygon.id]: {
       url: polygon.rpcUrls.default.http[0],
