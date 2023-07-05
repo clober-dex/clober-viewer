@@ -111,7 +111,8 @@ const config: HardhatConfig = {
     [mainnet.id]: {
       url: mainnet.rpcUrls.default.http[0],
       chainId: mainnet.id,
-      accounts: [getMainnetPrivateKey()],
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
       gas: 'auto',
       gasPrice: 'auto',
       gasMultiplier: 1,
@@ -121,6 +122,12 @@ const config: HardhatConfig = {
       saveDeployments: true,
       tags: ['mainnet', 'prod'],
       companionNetworks: {},
+      verify: {
+        etherscan: {
+          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiUrl: 'https://api.etherscan.io',
+        },
+      },
     },
     [polygon.id]: {
       url: polygon.rpcUrls.default.http[0],
